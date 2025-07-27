@@ -73,7 +73,7 @@ Defines:
 * **Linear kernel**: $K(x, y) = x^T y$
 * **Polynomial kernel**: $K(x, y) = (x^T y + 1)^d$
 * **RBF kernel**:
-
+  
 $$
 K(x, y) = \exp\left(-\gamma \|x - y\|^2\right)
 $$
@@ -99,15 +99,14 @@ This is the core of the SVM training process using the **Sequential Minimal Opti
    - The algorithm looks for a pair of `α_i` and `α_j` that violate the Karush-Kuhn-Tucker (KKT) conditions. These are candidates for update.
    - For each training point `i`, the decision function is evaluated:
 
-     $$
-     f(x_i) = \sum_{j=1}^{n} \alpha_j y_j K(x_j, x_i) + b
-     $$
+$$
+f(x_i) = \sum_{j=1}^{n} \alpha_j y_j K(x_j, x_i) + b
+$$
+   - The error for point 'i' is then calculated as:
 
-     The error for point `i` is then computed as:
-
-     $$
-     E_i = f(x_i) - y_i
-     $$
+$$
+E_i = f(x_i) - y_i
+$$
 
 3. **Selecting `α_j`**:
    - Once `i` is chosen, another index `j ≠ i` is selected heuristically (often at random).
@@ -116,48 +115,44 @@ This is the core of the SVM training process using the **Sequential Minimal Opti
 4. **Computing Update Parameters**:
    - The kernel function is used to compute:
 
-     $$
-     \eta = 2 K(x_i, x_j) - K(x_i, x_i) - K(x_j, x_j)
-     $$
+$$
+\eta = 2 K(x_i, x_j) - K(x_i, x_i) - K(x_j, x_j)
+$$
 
    - If `η ≥ 0`, we skip the update (as it would not improve the objective function).
    - Otherwise, the new `α_j` is updated using:
 
-     $$
-     \alpha_j^{\text{new}} = \alpha_j^{\text{old}} - \frac{y_j (E_i - E_j)}{\eta}
-     $$
+$$
+\alpha_j^{\text{new}} = \alpha_j^{\text{old}} - \frac{y_j (E_i - E_j)}{\eta}
+$$
 
-5. **Clipping α_j**:
-   - The new value of `α_j` must be clipped within `[L, H]`, where:
-     - If `y_i ≠ y_j`:
+5. ### Clipping αⱼ
 
-       $$
-       L = \max(0, \alpha_j - \alpha_i), \quad H = \min(C, C + \alpha_j - \alpha_i)
-       $$
+The new value of αⱼ must be clipped within `[L, H]`, where:
 
-     - If `y_i = y_j`:
-
-       $$
-       L = \max(0, \alpha_i + \alpha_j - C), \quad H = \min(C, \alpha_i + \alpha_j)
-       $$
-
+- If *yᵢ ≠ yⱼ*:
+     L = max(0, αⱼ - αᵢ)
+     H = min(C, C + αⱼ - αᵢ)
+- If *yᵢ = yⱼ*:
+     L = max(0, αᵢ + αⱼ - C)
+     H = min(C, αᵢ + αⱼ)
 6. **Updating α_i**:
    - Once `α_j` is updated, `α_i` is computed as:
-
-     $$
-     \alpha_i^{\text{new}} = \alpha_i^{\text{old}} + y_i y_j (\alpha_j^{\text{old}} - \alpha_j^{\text{new}})
-     $$
+     
+$$
+\alpha_i^{\text{new}} = \alpha_i^{\text{old}} + y_i y_j (\alpha_j^{\text{old}} - \alpha_j^{\text{new}})
+$$
 
 7. **Updating Bias Term `b`**:
    - Two possible updated bias values are computed:
 
-     $$
-     b_1 = b - E_i - y_i (α_i^{\text{new}} - α_i^{\text{old}}) K(x_i, x_i) - y_j (α_j^{\text{new}} - α_j^{\text{old}}) K(x_i, x_j)
-     $$
+$$
+b_1 = b - E_i - y_i (α_i^{\text{new}} - α_i^{\text{old}}) K(x_i, x_i) - y_j (α_j^{\text{new}} - α_j^{\text{old}}) K(x_i, x_j)
+$$
 
-     $$
-     b_2 = b - E_j - y_i (α_i^{\text{new}} - α_i^{\text{old}}) K(x_i, x_j) - y_j (α_j^{\text{new}} - α_j^{\text{old}}) K(x_j, x_j)
-     $$
+$$
+b_2 = b - E_j - y_i (α_i^{\text{new}} - α_i^{\text{old}}) K(x_i, x_j) - y_j (α_j^{\text{new}} - α_j^{\text{old}}) K(x_j, x_j)
+$$
 
    - The final `b` is chosen depending on whether `α_i` or `α_j` lies strictly between 0 and `C`. If both lie at the bounds, the average of `b1` and `b2` is taken.
 
