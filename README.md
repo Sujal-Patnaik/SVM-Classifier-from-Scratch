@@ -1,4 +1,3 @@
-Here's a detailed and well-formatted `README.md` file for your SVM implementation from scratch. This version includes a comprehensive explanation, usage instructions, and LaTeX-rendered math via GitHub-compatible Markdown.
 
 ---
 
@@ -182,8 +181,6 @@ The SMO algorithm effectively solves the **quadratic programming problem** under
 
 ---
 
-Let me know if you’d like me to break this into docstrings inside your actual `fit` method, or include visual examples of how alphas update.
-
 
 ---
 
@@ -293,7 +290,7 @@ Try running the model on toy datasets like XOR, circles, or linearly separable s
 
 ## 🧑‍💻 Author
 
-Implemented from scratch by \[Your Name or Team Name].
+Implemented from scratch by \[SUJAL PATNAIK].
 
 ---
 
