@@ -86,18 +86,109 @@ $$
 def fit(self, X, y):
 ```
 
-* Implements **SMO algorithm**
-* Maintains alpha values and bias $b$
-* Uses heuristics to choose optimal alpha pairs
-* Updates alphas and $b$ using:
+This is the core of the SVM training process using the **Sequential Minimal Optimization (SMO)** algorithm. The `fit` method is responsible for solving the dual optimization problem by iteratively updating the Lagrange multipliers `α` and the bias `b`.
 
-$$
-\eta = 2 K(x_i, x_j) - K(x_i, x_i) - K(x_j, x_j)
-$$
+### 🔍 What Happens Inside?
 
-$$
-\alpha_j^{\text{new}} = \alpha_j^{\text{old}} - \frac{y_j (E_i - E_j)}{\eta}
-$$
+1. **Initialization**:
+   - All Lagrange multipliers `α_i` are initialized to zero.
+   - The bias `b` is initialized to zero.
+   - The input labels `y` are transformed from `{0, 1}` to `{-1, 1}` to comply with the SVM formulation.
+
+2. **Main SMO Loop**:
+   - The algorithm looks for a pair of `α_i` and `α_j` that violate the Karush-Kuhn-Tucker (KKT) conditions. These are candidates for update.
+   - For each training point `i`, the decision function is evaluated:
+
+     $$
+     f(x_i) = \sum_{j=1}^{n} \alpha_j y_j K(x_j, x_i) + b
+     $$
+
+     The error for point `i` is then computed as:
+
+     $$
+     E_i = f(x_i) - y_i
+     $$
+
+3. **Selecting `α_j`**:
+   - Once `i` is chosen, another index `j ≠ i` is selected heuristically (often at random).
+   - Similarly, we calculate the error `E_j`.
+
+4. **Computing Update Parameters**:
+   - The kernel function is used to compute:
+
+     $$
+     \eta = 2 K(x_i, x_j) - K(x_i, x_i) - K(x_j, x_j)
+     $$
+
+   - If `η ≥ 0`, we skip the update (as it would not improve the objective function).
+   - Otherwise, the new `α_j` is updated using:
+
+     $$
+     \alpha_j^{\text{new}} = \alpha_j^{\text{old}} - \frac{y_j (E_i - E_j)}{\eta}
+     $$
+
+5. **Clipping α_j**:
+   - The new value of `α_j` must be clipped within `[L, H]`, where:
+     - If `y_i ≠ y_j`:
+
+       $$
+       L = \max(0, \alpha_j - \alpha_i), \quad H = \min(C, C + \alpha_j - \alpha_i)
+       $$
+
+     - If `y_i = y_j`:
+
+       $$
+       L = \max(0, \alpha_i + \alpha_j - C), \quad H = \min(C, \alpha_i + \alpha_j)
+       $$
+
+6. **Updating α_i**:
+   - Once `α_j` is updated, `α_i` is computed as:
+
+     $$
+     \alpha_i^{\text{new}} = \alpha_i^{\text{old}} + y_i y_j (\alpha_j^{\text{old}} - \alpha_j^{\text{new}})
+     $$
+
+7. **Updating Bias Term `b`**:
+   - Two possible updated bias values are computed:
+
+     $$
+     b_1 = b - E_i - y_i (α_i^{\text{new}} - α_i^{\text{old}}) K(x_i, x_i) - y_j (α_j^{\text{new}} - α_j^{\text{old}}) K(x_i, x_j)
+     $$
+
+     $$
+     b_2 = b - E_j - y_i (α_i^{\text{new}} - α_i^{\text{old}}) K(x_i, x_j) - y_j (α_j^{\text{new}} - α_j^{\text{old}}) K(x_j, x_j)
+     $$
+
+   - The final `b` is chosen depending on whether `α_i` or `α_j` lies strictly between 0 and `C`. If both lie at the bounds, the average of `b1` and `b2` is taken.
+
+8. **Repeat Until Convergence**:
+   - The process continues until a certain number of passes occur without any updates to `α` (defined by `max_passes`), or until the maximum number of iterations is reached (`max_iter`).
+
+---
+
+### 🧠 Why This Works
+
+The SMO algorithm effectively solves the **quadratic programming problem** underlying the SVM by breaking it into 2-dimensional sub-problems, which are easier to solve analytically. This allows us to train non-linear SVMs efficiently with custom kernels — without relying on external optimization libraries.
+
+---
+
+### 🧪 Implementation Tips
+
+- You can monitor convergence by tracking how many α values change in each pass.
+- Large values of `C` lead to smaller margins and more aggressive fitting.
+- For RBF or polynomial kernels, tuning `gamma` and `degree` respectively is essential for good performance.
+
+---
+
+### 🛑 Limitations
+
+- SMO works best for smaller datasets; it can become slow for very large ones.
+- For large-scale linear problems, the `fit_gd` method is more efficient.
+
+---
+
+Let me know if you’d like me to break this into docstrings inside your actual `fit` method, or include visual examples of how alphas update.
+
 
 ---
 
