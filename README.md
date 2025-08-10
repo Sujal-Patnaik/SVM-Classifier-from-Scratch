@@ -8,10 +8,6 @@ This repository provides a **from-scratch implementation of Support Vector Machi
 * **Sequential Minimal Optimization (SMO)** algorithm for training with custom kernels
 * **Gradient Descent (GD)** training for linear SVMs (with Hinge loss)
 
-###  File Structure
-
-* `SVM` class: Contains all necessary methods for training and prediction using SMO and GD.
-* Kernels: Linear, Polynomial, and RBF kernels supported.
 
 ---
 
@@ -277,7 +273,7 @@ preds = model.predict_gd(X)
 
 ##  Testing
 
-Try running the model on toy datasets like XOR, circles, or linearly separable sets to see the effect of kernels.
+This SVM from scratch has been tested with various datasets for both binary and multiclass classification(Using One Vs Rest approach) which is there in the code given.
 
 ---
 
