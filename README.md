@@ -1,21 +1,21 @@
 
 ---
 
-## 📘 Support Vector Machine (SVM) from Scratch
+##  Support Vector Machine (SVM) from Scratch
 
 This repository provides a **from-scratch implementation of Support Vector Machines (SVMs)** using only NumPy, supporting both:
 
 * **Sequential Minimal Optimization (SMO)** algorithm for training with custom kernels
 * **Gradient Descent (GD)** training for linear SVMs (with Hinge loss)
 
-### 📂 File Structure
+###  File Structure
 
 * `SVM` class: Contains all necessary methods for training and prediction using SMO and GD.
 * Kernels: Linear, Polynomial, and RBF kernels supported.
 
 ---
 
-## 🧠 Theory Behind SVM
+##  Theory Behind SVM
 
 ### Objective
 
@@ -45,7 +45,7 @@ $$
 
 ---
 
-## ⚙️ Class Overview
+##  Class Overview
 
 ### `__init__`
 
@@ -61,7 +61,7 @@ Initializes the SVM with user-defined:
 
 ---
 
-## 🔧 Kernels
+##  Kernels
 
 ```python
 def kernel(self, x, y):
@@ -79,7 +79,7 @@ $$
 
 ---
 
-## 🧮 Training with SMO
+##  Training with SMO
 
 ```python
 def fit(self, X, y):
@@ -87,21 +87,21 @@ def fit(self, X, y):
 
 This is the core of the SVM training process using the **Sequential Minimal Optimization (SMO)** algorithm. The `fit` method is responsible for solving the dual optimization problem by iteratively updating the Lagrange multipliers `α` and the bias `b`.
 
-### 🔍 What Happens Inside?
+###  What Happens Inside?
 
 1. **Initialization**:
    - All Lagrange multipliers `α_i` are initialized to zero.
    - The bias `b` is initialized to zero.
    - The input labels `y` are transformed from `{0, 1}` to `{-1, 1}` to comply with the SVM formulation.
-
+   -  An error cache E_cache is initialized. This cache stores the current error for each training sample, avoiding the need to re-compute it for every iteration, which is a major speed optimization.
 2. **Main SMO Loop**:
    - The algorithm looks for a pair of `α_i` and `α_j` that violate the Karush-Kuhn-Tucker (KKT) conditions. These are candidates for update.
-   - For each training point `i`, the decision function is evaluated:
+   - For each training point i, the error E_i is directly retrieved from the error cache.
 
 $$
 f(x_i) = \sum_{j=1}^{n} \alpha_j y_j K(x_j, x_i) + b
 $$
-   - The error for point 'i' is then calculated as:
+   - The error for point 'i' is already calculated and stored in Error cache as:
 
 $$
 E_i = f(x_i) - y_i
@@ -109,7 +109,8 @@ $$
 
 3. **Selecting `α_j`**:
    - Once `i` is chosen, another index `j ≠ i` is selected heuristically (often at random).
-   - Similarly, we calculate the error `E_j`.
+   - The error E_j is also retrieved from the error cache.
+
 
 4. **Computing Update Parameters**:
    - The kernel function is used to compute:
@@ -155,18 +156,18 @@ $$
 
    - The final `b` is chosen depending on whether `α_i` or `α_j` lies strictly between 0 and `C`. If both lie at the bounds, the average of `b1` and `b2` is taken.
 
-8. **Repeat Until Convergence**:
-   - The process continues until a certain number of passes occur without any updates to `α` (defined by `max_passes`), or until the maximum number of iterations is reached (`max_iter`).
-
+8. **Updating the Error Cache and Repeating**:
+   - After updating α_i, α_j, and b, the error cache E_cache is updated for all samples in a single, vectorized step to reflect the changes.
+   - The process continues until a certain number of passes occur without any updates to α (defined by max_passes), or until the maximum number of iterations is reached (max_iter).
 ---
 
-### 🧠 Why This Works
+###  Why This Works
 
 The SMO algorithm effectively solves the **quadratic programming problem** underlying the SVM by breaking it into 2-dimensional sub-problems, which are easier to solve analytically. This allows us to train non-linear SVMs efficiently with custom kernels — without relying on external optimization libraries.
 
 ---
 
-### 🧪 Implementation Tips
+###  Implementation Tips
 
 - You can monitor convergence by tracking how many α values change in each pass.
 - Large values of `C` lead to smaller margins and more aggressive fitting.
@@ -174,7 +175,7 @@ The SMO algorithm effectively solves the **quadratic programming problem** under
 
 ---
 
-### 🛑 Limitations
+###  Limitations
 
 - SMO works best for smaller datasets; it can become slow for very large ones.
 - For large-scale linear problems, the `fit_gd` method is more efficient.
@@ -184,7 +185,7 @@ The SMO algorithm effectively solves the **quadratic programming problem** under
 
 ---
 
-## 🧠 Decision Function (SMO)
+##  Decision Function (SMO)
 
 ```python
 def _decision_function_index(self, i):
@@ -198,7 +199,7 @@ $$
 
 ---
 
-## 📊 Prediction (SMO)
+##  Prediction (SMO)
 
 ```python
 def predict(self, X):
@@ -212,7 +213,7 @@ $$
 
 ---
 
-## 🔁 Training with Gradient Descent
+##  Training with Gradient Descent
 
 ```python
 def fit_gd(self, X, y, lr=0.001, epochs=1000):
@@ -237,7 +238,7 @@ $$
 
 ---
 
-## 🔮 Prediction (Gradient Descent)
+##  Prediction (Gradient Descent)
 
 ```python
 def predict_gd(self, X):
@@ -251,7 +252,7 @@ $$
 
 ---
 
-## ✅ Usage Example
+##  Usage Example
 
 ```python
 X = np.array([[1,2], [2,3], [3,3], [2,1], [3,2]])
@@ -274,13 +275,13 @@ preds = model.predict_gd(X)
 
 ---
 
-## 🧪 Testing
+##  Testing
 
 Try running the model on toy datasets like XOR, circles, or linearly separable sets to see the effect of kernels.
 
 ---
 
-## 📌 Notes
+##  Notes
 
 * **Gradient Descent** method supports only **linear kernel**
 * **SMO** can handle **non-linear kernels** like RBF and polynomial
@@ -288,13 +289,13 @@ Try running the model on toy datasets like XOR, circles, or linearly separable s
 
 ---
 
-## 🧑‍💻 Author
+##  Author
 
 Implemented from scratch by \[SUJAL PATNAIK].
 
 ---
 
-## 📄 License
+##  License
 
 This project is licensed under the MIT License - feel free to use and modify.
 
